@@ -32,3 +32,9 @@ Miass, уведоми меня за месяц о дне рождении Мам
 
 4 ЭТАП
 1) Анализ социальных сетей...
+
+Список литературы:
+https://groosha.gitbooks.io/telegram-bot-lessons/content/
+https://github.com/eternnoir/pyTelegramBotAPI#message-handlers
+https://tlgrm.ru/docs/bots/api#making-requests
+https://flask-hookserver.readthedocs.io/en/latest/
