@@ -1,4 +1,4 @@
-    ![alt text](Miass_github_128.png) 
+![alt text](Miass_github_128.png) 
 # Miass
 Miass - is a bot-project that help user to find information from social media
 
