@@ -1,1 +1,1 @@
-web: python3 Miass/run.py
+web: gunicorn runp-heroku:app
