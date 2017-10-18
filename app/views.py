@@ -15,7 +15,7 @@ def echo_message(message):
     bot.reply_to(message, message.text)
 
 
-@app.route("/токен бота", methods=['POST'])
+@app.route("/431904557:AAHgmukJijjZs70ghCo6xj3zvnk9M6UKYD4", methods=['POST'])
 def getMessage():
     bot.process_new_updates([telebot.types.Update.de_json(request.stream.read().decode("utf-8"))])
     return "!", 200
