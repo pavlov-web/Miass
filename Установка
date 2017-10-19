@@ -1,0 +1,79 @@
+1) Ставим ubuntu 16.04 LTS
+Устанавливаем python 3.6
+
+sudo add-apt-repository ppa:jonathonf/python-3.6
+sudo apt-get update
+sudo apt-get install python3.6
+
+По умолчанию в ubuntu 16.04 стоит python версии 3.5
+Поэтому меняем его на 3.6 командой: 
+	
+sudo ln -fs /usr/bin/python3.6 /usr/bin/python3
+
+2) Устанавливаем pipenv на локально машине: pip install pipenv
+3) Устанавливаем postgresql (Heroku бесплатно работает только с ним): sudo apt-get install postgresql
+Посмотреть где установлен postgresql: which psql
+Запуск postgresql: 
+3.1) sudo -u postgres -i
+3.2) psql
+
+4) Устанавливаем Heroku:
+sudo add-apt-repository "deb https://cli-assets.heroku.com/branches/stable/apt ./"
+curl -L https://cli-assets.heroku.com/apt/release.key | sudo apt-key add -
+sudo apt-get update
+sudo apt-get install heroku 
+
+Теперь нужно зарегестрироваться на сайте heroku, после чего ты должен скинуть мне свой акк (New collaborator)
+Я добавляю тебя к приложению.
+
+Наше приложение(продакшн) запускается на репозитории heroku:
+https://git.heroku.com/miass-bot.git
+
+Адрес, на котором работает наше приложение(Собственно сам сервер):
+https://miass-bot.herokuapp.com/
+
+Но также мы держим свой собвенный репозиторий на git:
+https://github.com/Cryolitech/Miass.git
+
+Так для начала давайте скачаем репозиторий
+
+5) Скачиваем репозиторий: 
+git clone https://github.com/Cryolitech/Miass.git
+Переходим в него: cd Miass
+
+Теперь говорим heroku, что в нашем репозитории находится наше приложение heroku:
+heroku git:remote -a miass-bot
+
+Наш продакшн сервер запущен, поэтому для начала отключаем его
+heroku ps:scale web=0 (включить heroku ps:scale web=1)
+
+6)Теперь нужно создать pipenv:
+Для этого нужно выполнить:
+pipenv --three (на соновании файла pipfile он создаст виртуальной окружение, с теми модулями, которые указаны в файле)
+pipenv install (Установка виртуального окружения)
+pipenv shell (и собственно запуск виртуального окружения, есть также отделаьно команда, которая запускает pipenv: 
+переходишь в ~/.local/share/virtualenvs/тут_название_окружения/
+Теперь: . bin/activate 
+)
+~/ - корнева папка (Для перехода cd ~)
+В данной папке лучше все команды выполнять через виртуальное окружение
++ все модули, которые ты добаляешь в проект, нужно прописывать в терминале:
+pipenv install модуль/пакеты (в файле pipfile появится новый модуль)
+
+Далее можешь делать что угодно с проектом (Кодить)
+
+6)Запускаем сервер локально: heroku local (обязательно запускать)
+Сервер будет работать по адресу: http://localhost:5000
+7) 
+При загрузке команды heroku local или heroku local web:
+Heroku смотрит что написано в файле Procfile, в котором указано что должно делать прилождению для запуска.
+
+После кодинга и проделанных работ прописываем:
+git add .
+git commit -m "Demo"
+git push heroku master (ТОЛЬКО ДЛЯ ПРОДАКШНА!) (Не использовать без моего ведома)
+git push origin master (В репозитории записывает в ветку master) (Нужно создать свою ветку. Это команда для финальной версии выхода в продакшн)
+
+Открыть сервер heroku open или в браузере: https://miass-bot.herokuapp.com/
+
+
