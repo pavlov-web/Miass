@@ -41,7 +41,7 @@ def send_time_now(message):
 #!------------------------------------------------------------------------------------------!#
 # СЕРВЕРНАЯ ЧАСТЬ (НЕ ТРОГАТЬ)
 #!------------------------------------------------------------------------------------------!#
-
+"""
 @app.route('/' + token, methods=['POST'])
 def get_message():
     bot.process_new_updates([telebot.types.Update.de_json(request.stream.read().decode("utf-8"))])
@@ -53,7 +53,7 @@ def web_hook():
     bot.remove_webhook()
     bot.set_webhook(url='https://miass-bot.herokuapp.com/' + token)
     return "CONNECTED", 200
-
+"""
 #app.run(host="0.0.0.0", port=os.environ.get('PORT', 5000)) - это нам не нужно, потому что мы выполняем команду: gunicorn runp-heroku:app
 
 # Если web-хуки не работают или хочешь запустить на локальной машине
@@ -73,6 +73,6 @@ def web_hook():
 # heroku ps:scale web=1 #! Включаем сервер
 
 #или выполняем bot.remove_webhook()
-#bot.remove_webhook()
-#bot.polling(none_stop=True)
+bot.remove_webhook()
+bot.polling(none_stop=True)
 
