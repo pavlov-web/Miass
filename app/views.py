@@ -27,6 +27,8 @@ def webhook():
     URL_HOOK = "https://young-tundra-38775.herokuapp.com/431904557:AAHrVTwCYRd_eaJggx7-_lfVmgGsODrR4N0/"
     bot.set_webhook(url=URL_HOOK)
     return "!", 200
+
+app.run(host="0.0.0.0", port=os.environ.get('PORT', 5000), debug = True)
 """
 #Включить, если не работают веб хуки
 bot.polling(none_stop=True)
