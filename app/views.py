@@ -1,12 +1,14 @@
 from app import app
+from app.config import token
+from app.db_postgresql import SQL_Postgre
 import os
 import telebot
 from flask import request
 import datetime
 
-token = '431904557:AAG2Yclqsg_AWJafkOfXB9uTuFZ-pEWfErQ'
 
 bot = telebot.TeleBot(token)
+
 
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
@@ -33,6 +35,17 @@ def send_welcome(message):
     userName = message.from_user.username # Имя, отображающееся в telegram
     lastName = message.from_user.last_name # Фамилия пользователя
     languageCode = message.from_user.language_code # Используемый язык
+    db = SQL_Postgre()
+    # check_user_availible = True - Пользователь существует в системе
+    #                      = False - Пользователь не существует в системе
+    check_user_availible = db.check_user_id(userId)
+    if check_user_availible == False:
+        a = db.new_user(userId,firstName,userName,lastName)
+        print(a)
+    #query = 'SELECT t.telegram_id FROM public.contact_telegram t  where t.telegram_id = ' + str(userId)
+    #a = db.selectAll(query)
+    #print(a)
+    db.close()
 
 @bot.message_handler(commands=['time'])
 def send_time_now(message):
