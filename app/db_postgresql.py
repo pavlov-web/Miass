@@ -41,6 +41,24 @@ class SQL_Postgre:
             self.cur.execute(query)
             results = self.cur.fetchall()
             return results
+    def new_contacts(self,name, birth, user_id):
+        with self.conn:
+            self.cur.execute("insert into contact_users(name, birth,contact_user_id) values(%s,%s,%s)",(str(name),str(birth),str(user_id)))
+            return True
+
+    def check_contacts(self,telegramId):
+        with self.conn:
+            query = 'SELECT DISTINCT contact_user_id FROM public.contact_users WHERE contact_user_id = 61714776;'
+            self.cur.execute(query)
+            if self.cur.fetchone() == None:
+                return False
+            else:
+                return True
+
+    def delete_contacts(self,telegramId):
+        with self.conn:
+            self.cur.execute("DELETE FROM contact_users WHERE contact_user_id = " + str(telegramId))
+
 
     def close(self):
         self.conn.commit()  # Загружае все звпросы на сервер БД

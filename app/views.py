@@ -1,10 +1,13 @@
 from app import app
 from app.config import token
 from app.db_postgresql import SQL_Postgre
+from app.csvEditor import csv_dict_reader
 import os
 import telebot
 from flask import request
 import datetime
+import requests
+
 
 
 bot = telebot.TeleBot(token)
@@ -50,6 +53,25 @@ def send_welcome(message):
 @bot.message_handler(commands=['time'])
 def send_time_now(message):
     bot.send_message(message.chat.id, 'Доброе утро, сегодня {dt:%A} {dt:%B} {dt.day}, {dt.year}: '.format(dt = datetime.datetime.now()))
+
+@bot.message_handler(commands=['contacts'])
+def send_welcome_contacts(message):
+    bot.send_message(message.chat.id, "Список команд:\n /createContact - Загрузить контакты файлом")
+
+@bot.message_handler(func=lambda message: True, commands=['createContact'])
+def new_contact_list(message):
+    bot.send_message(message.chat.id, 'Пожалуйста, загрузите файл в формате GOOGLE CSV\nПодробнее: https://www.google.com/contacts/u/0/?cplus=0#contacts\nЕще->Экспорт->Выберите формат файла для экспорта->\
+                                       Google CSV (для импорта в аккаунт Google)')
+
+# Загрузка документа
+@bot.message_handler(content_types=['document'])
+def downloadFile(message):
+    userId = message.from_user.id
+    a = message.document.file_id
+    file_info = bot.get_file(a)
+    file = requests.get('https://api.telegram.org/file/bot{0}/{1}'.format(token, file_info.file_path))
+    csv_dict_reader(file.text, userId)
+    bot.send_message(message.chat.id, "Файл успешно загружен.")
 
 #!------------------------------------------------------------------------------------------!#
 # СЕРВЕРНАЯ ЧАСТЬ (НЕ ТРОГАТЬ)
