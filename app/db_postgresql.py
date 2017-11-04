@@ -59,6 +59,19 @@ class SQL_Postgre:
         with self.conn:
             self.cur.execute("DELETE FROM contact_users WHERE contact_user_id = " + str(telegramId))
 
+    def find_data_contact(self,month,day):
+        with self.conn:
+            month1 = str('11')
+            day1 = str('4')
+            query = 'SELECT  name,birth,contact_user_id FROM public.contact_users WHERE Extract(month from birth) = ' + month1 + ' AND Extract(day from birth) = ' + day1
+            self.cur.execute(query)
+            if self.cur.fetchall() == None:
+                return 0
+            else:
+                return self.cur.fetchall()
+
+
+
 
     def close(self):
         self.conn.commit()  # Загружае все звпросы на сервер БД

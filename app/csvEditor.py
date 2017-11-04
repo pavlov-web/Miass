@@ -22,3 +22,5 @@ def csv_dict_reader(text, user_id):
             if name != '':
                 db.new_contacts(name, birth, user_id)
     db.close()
+
+

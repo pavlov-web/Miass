@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from app import app
 from app.config import token
 from app.db_postgresql import SQL_Postgre
@@ -7,11 +8,11 @@ import telebot
 from flask import request
 import datetime
 import requests
-
-
+from datetime import  datetime
+import time
+import threading
 
 bot = telebot.TeleBot(token)
-
 
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
@@ -44,7 +45,6 @@ def send_welcome(message):
     check_user_availible = db.check_user_id(userId)
     if check_user_availible == False:
         a = db.new_user(userId,firstName,userName,lastName)
-        print(a)
     #query = 'SELECT t.telegram_id FROM public.contact_telegram t  where t.telegram_id = ' + str(userId)
     #a = db.selectAll(query)
     #print(a)
@@ -52,7 +52,7 @@ def send_welcome(message):
 
 @bot.message_handler(commands=['time'])
 def send_time_now(message):
-    bot.send_message(message.chat.id, 'Доброе утро, сегодня {dt:%A} {dt:%B} {dt.day}, {dt.year}: '.format(dt = datetime.datetime.now()))
+    bot.send_message(message.chat.id, 'Доброе утро, сегодня {dt:%A} {dt:%B} {dt.day}, {dt.year}: '.format(dt = datetime.now()))
 
 @bot.message_handler(commands=['contacts'])
 def send_welcome_contacts(message):
@@ -73,6 +73,45 @@ def downloadFile(message):
     csv_dict_reader(file.text, userId)
     bot.send_message(message.chat.id, "Файл успешно загружен.")
 
+#from app import contact_timer
+'''
+def start_runner():
+    thread = threading.Thread(target=run_job)
+    thread.start()
+
+def run_job():
+    while True:
+        now = datetime.now()
+        print(now.year)
+        print(now.month)
+        print(now.day)
+        print(now.minute)
+        print(now.second)
+        time.sleep(3)
+        db = SQL_Postgre()
+        contact_info = db.find_data_contact(now.month,now.day)
+        if contact_info.__len__() != 0:
+            print(contact_info[0][0])
+            strmsg = 'День рождение у' + str(contact_info[0][1]) + ' ' + str(contact_info[0][0])
+            bot.send_message(contact_info[0][2], strmsg)
+        db.close()
+
+start_runner()
+def job():
+    while True:
+        now = datetime.now()
+        db = SQL_Postgre()
+        #contact_info = db.find_data_contact(now.month, now.day)
+
+        bot.send_message(61714776, "hello")
+        time.sleep(3)
+        db.close()
+
+def start_runner():
+    thread = threading.Thread(target=job)
+    thread.start()
+start_runner()
+'''
 #!------------------------------------------------------------------------------------------!#
 # СЕРВЕРНАЯ ЧАСТЬ (НЕ ТРОГАТЬ)
 #!------------------------------------------------------------------------------------------!#
@@ -107,7 +146,9 @@ def web_hook():
 # Телеграма отработает хуки
 # heroku ps:scale web=1 #! Включаем сервер
 
+
 #или выполняем bot.remove_webhook()
 bot.remove_webhook()
 bot.polling(none_stop=True)
+
 
