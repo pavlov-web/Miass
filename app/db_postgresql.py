@@ -1,6 +1,8 @@
 import os
 from urllib import parse
 import psycopg2
+import sys
+
 class SQL_Postgre:
     def __init__(self):
         # ! параметры БД
@@ -61,14 +63,12 @@ class SQL_Postgre:
 
     def find_data_contact(self,month,day):
         with self.conn:
-            month1 = str('11')
-            day1 = str('4')
-            query = 'SELECT  name,birth,contact_user_id FROM public.contact_users WHERE Extract(month from birth) = ' + month1 + ' AND Extract(day from birth) = ' + day1
-            self.cur.execute(query)
-            if self.cur.fetchall() == None:
-                return 0
-            else:
-                return self.cur.fetchall()
+            cur = self.conn.cursor()
+            query = 'SELECT  name,birth,contact_user_id FROM public.contact_users WHERE Extract(month from birth) = ' + str(month) + ' AND Extract(day from birth) = ' + str(day)
+            cur.execute(query)
+            date = cur.fetchall()
+            cur.close()
+            return date
 
 
 

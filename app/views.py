@@ -6,11 +6,12 @@ from app.csvEditor import csv_dict_reader
 import os
 import telebot
 from flask import request
-import datetime
+#from app.timezone import current_timezone
 import requests
-from datetime import  datetime
+import datetime
 import time
 import threading
+
 
 bot = telebot.TeleBot(token)
 
@@ -39,6 +40,10 @@ def send_welcome(message):
     userName = message.from_user.username # Имя, отображающееся в telegram
     lastName = message.from_user.last_name # Фамилия пользователя
     languageCode = message.from_user.language_code # Используемый язык
+    #msg_date = message.date #Дата отправки /start
+
+
+
     db = SQL_Postgre()
     # check_user_availible = True - Пользователь существует в системе
     #                      = False - Пользователь не существует в системе
@@ -52,7 +57,7 @@ def send_welcome(message):
 
 @bot.message_handler(commands=['time'])
 def send_time_now(message):
-    bot.send_message(message.chat.id, 'Доброе утро, сегодня {dt:%A} {dt:%B} {dt.day}, {dt.year}: '.format(dt = datetime.now()))
+    bot.send_message(message.chat.id, 'Доброе утро, сегодня {dt:%A} {dt:%B} {dt.day}, {dt.year},{dt.hour},{dt.minute}: '.format(dt = datetime.datetime.now()))
 
 @bot.message_handler(commands=['contacts'])
 def send_welcome_contacts(message):
@@ -95,23 +100,35 @@ def run_job():
             strmsg = 'День рождение у' + str(contact_info[0][1]) + ' ' + str(contact_info[0][0])
             bot.send_message(contact_info[0][2], strmsg)
         db.close()
-
-start_runner()
-def job():
-    while True:
-        now = datetime.now()
-        db = SQL_Postgre()
-        #contact_info = db.find_data_contact(now.month, now.day)
-
-        bot.send_message(61714776, "hello")
-        time.sleep(3)
-        db.close()
-
-def start_runner():
-    thread = threading.Thread(target=job)
-    thread.start()
-start_runner()
 '''
+
+def start_contact_notification():
+    thread = threading.Thread(target=run_thread)
+    thread.start()
+
+def run_thread():
+    global day_today
+    day_today = 0
+    while True:
+        current_date = datetime.date.today()    # Узнаем текущую дату
+        if current_date.day != day_today:       # Если сегодня еще не оправляли сообщения
+            if datetime.datetime.now().hour == 23:  # Уведомление пока настроено статически на 9 утра (Но если загрузим на серевер, то он будет будет присылать в 9 утра по времени сервера)
+                day_today = current_date.day
+                db = SQL_Postgre()
+                data_contact = db.find_data_contact(current_date.month, current_date.day)
+                if len(data_contact) != 0:
+                    for row in data_contact:
+                    
+                        bot.send_message(row[2], str(row[0]))
+                db.close()
+        time.sleep(60)
+
+
+# Запускаем новый поток, который каждый день смотрит кому нужно отправить уведомления из БД контактов
+start_contact_notification()
+
+
+
 #!------------------------------------------------------------------------------------------!#
 # СЕРВЕРНАЯ ЧАСТЬ (НЕ ТРОГАТЬ)
 #!------------------------------------------------------------------------------------------!#
