@@ -6,7 +6,7 @@ from app.csvEditor import csv_dict_reader
 import os
 import telebot
 from flask import request
-#from app.timezone import current_timezone
+from app.timezone import get_utc_offset_timezone, get_time_from_another_timezone
 import requests
 import datetime
 import time
@@ -40,24 +40,22 @@ def send_welcome(message):
     userName = message.from_user.username # Имя, отображающееся в telegram
     lastName = message.from_user.last_name # Фамилия пользователя
     languageCode = message.from_user.language_code # Используемый язык
-    #msg_date = message.date #Дата отправки /start
-
-
+    msg_date = message.date #Дата отправки /start
+    curr_utc_time = datetime.datetime.utcnow()
+    timezone = get_utc_offset_timezone(msg_date)
 
     db = SQL_Postgre()
     # check_user_availible = True - Пользователь существует в системе
     #                      = False - Пользователь не существует в системе
     check_user_availible = db.check_user_id(userId)
     if check_user_availible == False:
-        a = db.new_user(userId,firstName,userName,lastName)
-    #query = 'SELECT t.telegram_id FROM public.contact_telegram t  where t.telegram_id = ' + str(userId)
-    #a = db.selectAll(query)
-    #print(a)
+        a = db.new_user(userId,firstName,userName,lastName,timezone)
+
     db.close()
 
 @bot.message_handler(commands=['time'])
 def send_time_now(message):
-    bot.send_message(message.chat.id, 'Доброе утро, сегодня {dt:%A} {dt:%B} {dt.day}, {dt.year},{dt.hour},{dt.minute}: '.format(dt = datetime.datetime.now()))
+    bot.send_message(message.chat.id, 'Доброе утро, сегодня {dt:%A} {dt:%B} {dt.day}, {dt.year},{dt.hour},{dt.minute}: '.format(dt = datetime.datetime.utcnow()))
 
 @bot.message_handler(commands=['contacts'])
 def send_welcome_contacts(message):
@@ -111,8 +109,20 @@ def run_thread():
     day_today = 0
     while True:
         current_date = datetime.date.today()    # Узнаем текущую дату
-        if current_date.day != day_today:       # Если сегодня еще не оправляли сообщения
-            if datetime.datetime.now().hour == 23:  # Уведомление пока настроено статически на 9 утра (Но если загрузим на серевер, то он будет будет присылать в 9 утра по времени сервера)
+        current_time = datetime.datetime.now()
+
+        for utc in range(-12,12):
+            if datetime.datetime.now().hour + utc == 13 and datetime.datetime.now().minute == 0 :  # Уведомление пока настроено статически на 9 утра (Но если загрузим на серевер, то он будет будет присылать в 9 утра по времени сервера)
+                db = SQL_Postgre()
+                data_contact_withTimeZone = db.get_user_timezone(utc)
+                for currData in data_contact_withTimeZone:
+                    data_contact = db.find_data_contact(current_date.month, current_date.day, currData[0])
+                    if len(data_contact) != 0:
+                        for row in data_contact:
+                            bot.send_message(row[2], str(row[0]))
+                db.close()
+            '''
+            if datetime.datetime.now().hour == 9:  # Уведомление пока настроено статически на 9 утра (Но если загрузим на серевер, то он будет будет присылать в 9 утра по времени сервера)
                 day_today = current_date.day
                 db = SQL_Postgre()
                 data_contact = db.find_data_contact(current_date.month, current_date.day)
@@ -121,6 +131,7 @@ def run_thread():
                     
                         bot.send_message(row[2], str(row[0]))
                 db.close()
+            '''
         time.sleep(60)
 
 
