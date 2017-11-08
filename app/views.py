@@ -112,7 +112,7 @@ def run_thread():
         current_time = datetime.datetime.now()
 
         for utc in range(-12,12):
-            if datetime.datetime.now().hour + utc == 13 and datetime.datetime.now().minute == 0 :  # Уведомление пока настроено статически на 9 утра (Но если загрузим на серевер, то он будет будет присылать в 9 утра по времени сервера)
+            if datetime.datetime.now().hour + utc == 13:  # Уведомление пока настроено статически на 9 утра (Но если загрузим на серевер, то он будет будет присылать в 9 утра по времени сервера)
                 db = SQL_Postgre()
                 data_contact_withTimeZone = db.get_user_timezone(utc)
                 for currData in data_contact_withTimeZone:
