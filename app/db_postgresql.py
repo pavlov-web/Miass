@@ -25,7 +25,7 @@ class SQL_Postgre:
     def check_user_id(self, telegramId):
         with self.conn:
             cur = self.conn.cursor()
-            query = 'SELECT t.telegram_id FROM public.contact_telegram t  where t.telegram_id = ' + str(telegramId)
+            query = 'SELECT DISTINCT t.telegram_id FROM public.contact_telegram t  where t.telegram_id = ' + str(telegramId)
             cur.execute(query)
             data = cur.fetchone()
             cur.close()
@@ -80,9 +80,17 @@ class SQL_Postgre:
     def get_user_timezone(self,timezone):
         with self.conn:
             cur = self.conn.cursor()
-            query = 'SELECT DISTINCT telegram_id,timezone FROM public.contact_telegram WHERE timezone = ' + str(timezone)
+            query = 'SELECT telegram_id,timezone FROM public.contact_telegram WHERE timezone = ' + str(timezone)
             cur.execute(query)
             data = cur.fetchall()
+            cur.close()
+            return data
+    def get_timezone_fromId(self,user_id):
+        with self.conn:
+            cur = self.conn.cursor()
+            query = 'SELECT timezone FROM public.contact_telegram WHERE telegram_id = ' + str(user_id)
+            cur.execute(query)
+            data = cur.fetchone()
             cur.close()
             return data
 
